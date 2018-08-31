@@ -42,8 +42,11 @@
      }
    }  
    post {
-      always {
-         archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
-      }
+     agent {
+       label 'CentOS'
+     }
+     always {
+        archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
+     }
    }
 }
