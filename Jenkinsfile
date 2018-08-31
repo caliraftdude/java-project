@@ -1,5 +1,7 @@
  pipeline {
-   agent none
+   agent {
+     label 'CentOS'
+   }
 
    options {
       buildDiscarder(logRotator(numToKeepStr: '2',artifactNumToKeepStr: '1'))
@@ -29,6 +31,15 @@
        }
        steps {
          sh "scp -v -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/"
+       }
+     }
+     stage("Running on CentOS") {
+       agent {
+         label 'CentOS'
+       }
+       steps {
+         sh "wget http://ansible.f5labs.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
        }
      }
    }
