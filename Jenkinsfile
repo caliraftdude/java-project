@@ -20,10 +20,6 @@
         } 
      }
      stage('deploy') {
-       agent {
-         label 'master'
-       }       
-       
        steps {
          sh "scp -v -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/"
        }
