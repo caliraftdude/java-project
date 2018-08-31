@@ -45,5 +45,14 @@
          sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
        }
      }
+     stage("Runnning on Debian") {
+       agent {
+         docker 'openjdk:8u181-jre'
+       }
+       steps {
+         sh "wget http://ansible.f5labs.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+       }
+     }
    }
 }
