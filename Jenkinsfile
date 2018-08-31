@@ -1,7 +1,5 @@
  pipeline {
-   agent {
-     label 'CentOS'
-   }
+   agent none
 
    options {
       buildDiscarder(logRotator(numToKeepStr: '2',artifactNumToKeepStr: '1'))
@@ -45,7 +43,9 @@
    }
    post {
       always {
-         archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
+         node('CentOS') {
+            archiveArtifacts artifacts: 'dist/*.jar', fingerprint: true
+         }
       }
    }
 }
