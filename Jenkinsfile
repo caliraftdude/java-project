@@ -63,7 +63,7 @@
          branch 'master'
        }
        steps {
-         sh "cp /var/www/html/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
        }
      }
      stage("Promote Development Branch to Master") {
@@ -81,7 +81,7 @@
          echo "Checking out master branch"
          sh 'git checkout master'
          echo "Merging development into master branch"
-         sh 'git merge -m "Automated code merge from Jenkins - " development'
+         sh 'git merge -m "Automated code merge from Jenkins" development'
          echo "Pushing to origin master"
          sh 'git push origin master'
        }
