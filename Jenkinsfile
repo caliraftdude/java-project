@@ -81,7 +81,7 @@
          echo "Checking out master branch"
          sh 'git checkout master'
          echo "Merging development into master branch"
-         sh 'git merge -m "Automated code merge from Jenkins - " development'
+         sh 'git merge -m "Automated code merge from Jenkins" development'
          echo "Pushing to origin master"
          sh 'git push origin master'
        }
