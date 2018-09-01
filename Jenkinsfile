@@ -33,7 +33,7 @@
          label 'CentOS'
        }
        steps {
-         sh "ssh -o StrictHostKeyChecking=no 'mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}' "
+         sh "ssh -o StrictHostKeyChecking=no jenkins@ansible.f5labs.com 'mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}' "
          sh "scp -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/${env.BRANCH_NAME}/"
        }
      }
