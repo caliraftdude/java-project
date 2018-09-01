@@ -33,7 +33,8 @@
          label 'CentOS'
        }
        steps {
-         sh "scp -v -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/"
+         sh "ssh -o StrictHostKeyChecking=no 'mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}"
+         sh "scp -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/${env.BRANCH_NAME}/"
        }
      }
      stage("Running on CentOS") {
@@ -41,7 +42,7 @@
          label 'CentOS'
        }
        steps {
-         sh "wget http://ansible.f5labs.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
          sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
        }
      }
@@ -50,7 +51,7 @@
          docker 'openjdk:8u181-jre'
        }
        steps {
-         sh "wget http://ansible.f5labs.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
          sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
        }
      }
@@ -59,10 +60,31 @@
          label 'master'
        }
        when {
-         branch 'development'
+         branch 'master'
        }
        steps {
          sh "cp /var/www/html/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
+       }
+     }
+     stage("Promote Development Branch to Master") {
+       agent {
+         label 'master'
+       }
+       when {
+         branch 'development'
+       }
+       steps {
+         echo "Stashing any local changes"
+         sh 'git stash'
+         echo "Checking out development branch"
+         sh 'git checkout development'
+         echo "Checking out master branch"
+         sh 'git checkout master'
+         echo "Merging development into master branch"
+         sh 'git merge development'
+         echo "Pushing to origin master"
+         sh 'git push origin master'
+
        }
      }
    }
