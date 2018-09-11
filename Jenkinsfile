@@ -102,7 +102,7 @@
                 to: "d.holland@f5.com"
              )
           }
-       {
+       }
      }
      post {
         failure {
