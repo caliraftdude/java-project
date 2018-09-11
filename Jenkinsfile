@@ -5,6 +5,10 @@
       buildDiscarder(logRotator(numToKeepStr: '2',artifactNumToKeepStr: '1'))
    }
 
+   environment {
+      MAJOR_VERSION = 1
+   }
+
    stages {
      stage('Unit Tests') {
        agent {
@@ -34,7 +38,7 @@
        }
        steps {
          sh "ssh -o StrictHostKeyChecking=no jenkins@ansible.f5labs.com 'mkdir -p /var/www/html/rectangles/all/${env.BRANCH_NAME}' "
-         sh "scp -o StrictHostKeyChecking=no dist/rectangle_${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/${env.BRANCH_NAME}/"
+         sh "scp -o StrictHostKeyChecking=no dist/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar jenkins@ansible.f5labs.com:/var/www/html/rectangles/all/${env.BRANCH_NAME}/"
        }
      }
      stage("Running on CentOS") {
@@ -42,8 +46,8 @@
          label 'CentOS'
        }
        steps {
-         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
-         sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+         sh "java -jar rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
        }
      }
      stage("Runnning on Debian") {
@@ -51,8 +55,8 @@
          docker 'openjdk:8u181-jre'
        }
        steps {
-         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar"
-         sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+         sh "wget http://ansible.f5labs.com/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+         sh "java -jar rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
        }
      }
      stage("Promote to Green") {
@@ -63,7 +67,7 @@
          branch 'master'
        }
        steps {
-         sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.BUILD_NUMBER}.jar"
+         sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
        }
      }
      stage("Promote Development Branch to Master") {
@@ -84,6 +88,9 @@
          sh 'git merge -m "Automated code merge from Jenkins - final test" development'
          echo "Pushing to origin master"
          sh 'git push origin master'
+         echo "Tagging the Release"
+         sh "git tag rectangle-${env.MAJOR_VERSION}.${env.BUILD_NUMBER}"
+         sh "git push origin rectangle-${env.MAJOR_VERSION}.${env.BUILD_NUMBER}"
        }
      }
    }
